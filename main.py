@@ -6,16 +6,18 @@ import numpy as np
 from scipy.stats import gaussian_kde
 
 # ----------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
+plt.style.use('seaborn-v0_8-whitegrid')
+sns.set_context("notebook", font_scale=1.1)
+colors = sns.color_palette("husl", 12)
+plt.rcParams['figure.dpi'] = 100
+plt.rcParams['savefig.dpi'] = 300
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['axes.labelsize'] = 11
+plt.rcParams['axes.titlesize'] = 13
+plt.rcParams['xtick.labelsize'] = 10
+plt.rcParams['ytick.labelsize'] = 10
 # -----------------------------------------------------------------------------------
-df = pd.read_csv("cleaned_data.csv")
+df = pd.read_csv("NASA Near-Earth ObjectCleaned(NEO).csv")
 # Sidebar menu
 st.sidebar.title("Navigation")
 option = st.sidebar.selectbox("Choose an option:", ["EDA", "Prediction"])
@@ -320,21 +322,253 @@ if option == "EDA":
                     'Type': 'Positive' if corr_val > 0 else 'Negative'
                 })
 
+    # if correlation_pairs:
+    #     corr_df = pd.DataFrame(correlation_pairs).sort_values('Abs_Correlation', ascending=False)
+
+    #     # Display as styled table
+    #     display(corr_df.style.set_caption("Significant Correlation Pairs")
+    #                     .set_table_styles([{'selector': 'caption',
+    #                                         'props': [('color', 'black'),
+    #                                                 ('font-size', '14px'),
+    #                                                 ('font-weight', 'bold')]}]))
+    # else:
+    #     print("No significant correlations found (|r| > 0.3).")
+    st.divider()
+    # -------------------------------------------------------------------------------------------------------------------------------------------
+
+    st.markdown("## 📊 CORRELATION & MULTICOLLINEARITY ANALYSIS")
+
+    # Compute correlation matrix
+    corr_matrix = df[numeric_features].corr()
+
+    # --- Correlation Heatmaps ---
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
+
+    # Full correlation matrix (lower triangle only)
+    mask = np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
+    sns.heatmap(corr_matrix, mask=mask, annot=True, fmt='.3f', cmap='RdBu_r',
+                center=0, square=True, linewidths=1,
+                cbar_kws={"shrink": 0.8, "label": "Correlation"},
+                vmin=-1, vmax=1, ax=ax1, annot_kws={'size': 8})
+    ax1.set_title('Correlation Matrix (Lower Triangle)', fontsize=13, fontweight='bold', pad=15)
+
+    # High correlation only (|r| ≥ 0.5)
+    high_corr_matrix = corr_matrix.copy()
+    high_corr_matrix[abs(high_corr_matrix) < 0.5] = 0
+    sns.heatmap(high_corr_matrix, annot=True, fmt='.3f', cmap='coolwarm',
+                center=0, square=True, linewidths=1,
+                cbar_kws={"shrink": 0.8, "label": "Correlation"},
+                vmin=-1, vmax=1, ax=ax2, annot_kws={'size': 8})
+    ax2.set_title('Strong Correlations Only (|r| ≥ 0.5)', fontsize=13, fontweight='bold', pad=15)
+
+    st.pyplot(fig)
+
+    # --- Correlation pairs analysis ---
+    st.markdown("### 🔎 Correlation Strength Classification")
+
+    correlation_pairs = []
+    for i in range(len(corr_matrix.columns)):
+        for j in range(i+1, len(corr_matrix.columns)):
+            corr_val = corr_matrix.iloc[i, j]
+            abs_corr = abs(corr_val)
+
+            if abs_corr > 0.3:  # Show moderate and above
+                if abs_corr >= 0.9:
+                    strength = "Very Strong"
+                elif abs_corr >= 0.7:
+                    strength = "Strong"
+                elif abs_corr >= 0.5:
+                    strength = "Moderate"
+                else:
+                    strength = "Weak"
+
+                correlation_pairs.append({
+                    'Feature_1': corr_matrix.columns[i],
+                    'Feature_2': corr_matrix.columns[j],
+                    'Correlation': f"{corr_val:.4f}",
+                    'Abs_Correlation': f"{abs_corr:.4f}",
+                    'Strength': strength,
+                    'Type': 'Positive' if corr_val > 0 else 'Negative'
+                })
+
     if correlation_pairs:
         corr_df = pd.DataFrame(correlation_pairs).sort_values('Abs_Correlation', ascending=False)
-
-        # Display as styled table
-        display(corr_df.style.set_caption("Significant Correlation Pairs")
-                        .set_table_styles([{'selector': 'caption',
-                                            'props': [('color', 'black'),
-                                                    ('font-size', '14px'),
-                                                    ('font-weight', 'bold')]}]))
+        st.dataframe(corr_df)
     else:
-        print("No significant correlations found (|r| > 0.3).")
+        st.write("No significant correlations found.")
 
+    st.divider()
+    # -------------------------------------------------------------------------------------------------------------------------
+
+    from scipy.stats import pearsonr
+
+    st.subheader("📊 MULTIVARIATE RELATIONSHIP ANALYSIS")
+
+    # Select top features by variance for pairplot
+    top_variance_features = df[numeric_features].var().nlargest(min(6, len(numeric_features))).index.tolist()
+
+    # Pairplot
+    if len(top_variance_features) >= 2:
+        st.write(f"Pairplot for top {len(top_variance_features)} features by variance")
+
+        pairplot_data = df[top_variance_features].copy()
+        g = sns.pairplot(pairplot_data,
+                        diag_kind='kde',
+                        plot_kws={'alpha': 0.6, 's': 30, 'edgecolor': 'black', 'linewidth': 0.2},
+                        diag_kws={'alpha': 0.7, 'linewidth': 1})
+
+        g.fig.suptitle('Pairwise Relationships - Top Features by Variance',
+                    fontsize=12, fontweight='bold', y=1.01)
+
+        st.pyplot(g)
+
+    # Scatter Matrix with regression lines
+    if len(top_variance_features) >= 2:
+        fig, axes = plt.subplots(len(top_variance_features)-1, len(top_variance_features)-1,
+                                figsize=(10, 8))
+
+        colors = sns.color_palette("Set2", len(top_variance_features))
+
+        for i in range(len(top_variance_features)-1):
+            for j in range(len(top_variance_features)-1):
+                ax = axes[i, j] if len(top_variance_features) > 2 else axes
+
+                if j < i:
+                    ax.axis('off')
+                elif j == i:
+                    df[top_variance_features[i]].hist(bins=30, ax=ax, color=colors[i], edgecolor='black')
+                    ax.set_ylabel('')
+                else:
+                    ax.scatter(df[top_variance_features[j+1]], df[top_variance_features[i]],
+                            alpha=0.5, s=20, c=[colors[i]])
+
+                    # Regression line
+                    z = np.polyfit(df[top_variance_features[j+1]].dropna(),
+                                df[top_variance_features[i]].dropna(), 1)
+                    p = np.poly1d(z)
+                    ax.plot(df[top_variance_features[j+1]].sort_values(),
+                        p(df[top_variance_features[j+1]].sort_values()),
+                        "r--", linewidth=2, alpha=0.8)
+
+                    # Correlation
+                    valid_data = df[[top_variance_features[j+1], top_variance_features[i]]].dropna()
+                    if len(valid_data) > 0:
+                        r, p_val = pearsonr(valid_data.iloc[:, 0], valid_data.iloc[:, 1])
+                        ax.text(0.05, 0.95, f'r={r:.3f}', transform=ax.transAxes,
+                            fontsize=9, verticalalignment='top',
+                            bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+                if i == 0:
+                    ax.set_title(top_variance_features[j+1] if j != i else top_variance_features[i],
+                                fontsize=10, fontweight='bold')
+                if j == 0 or (j == i and i > 0):
+                    ax.set_ylabel(top_variance_features[i], fontsize=10, fontweight='bold')
+
+        plt.suptitle('Scatter Matrix with Regression Lines', fontsize=16, fontweight='bold', y=0.995)
+        plt.tight_layout()
+
+        st.pyplot(fig)
+
+    st.divider()
+    # --------------------------------------------------------------------------------------------------------------------------------------
+    st.subheader("⏳ TEMPORAL ANALYSIS")
     
-
-
+    if 'Close Approach Date' in df.columns:
+        # Convert to datetime
+        df_time = df.copy()
+        df_time['Close Approach Date'] = pd.to_datetime(df_time['Close Approach Date'], errors='coerce')
+        df_time = df_time.dropna(subset=['Close Approach Date']).sort_values('Close Approach Date')
+        
+        # Extract features
+        df_time['Year'] = df_time['Close Approach Date'].dt.year
+        df_time['Month'] = df_time['Close Approach Date'].dt.month
+        df_time['Quarter'] = df_time['Close Approach Date'].dt.quarter
+        df_time['Day_of_Week'] = df_time['Close Approach Date'].dt.dayofweek
+        df_time['Week'] = df_time['Close Approach Date'].dt.isocalendar().week
+        
+        # Monthly statistics table
+        monthly_stats = df_time.groupby(df_time['Close Approach Date'].dt.to_period('M')).agg({
+            'Asteroid ID': 'count',
+            'Distance from Earth (AU)': ['mean', 'min', 'max'],
+            'Relative Velocity (km/s)': ['mean', 'std']
+        })
+        monthly_stats.columns = ['Count', 'Avg_Distance', 'Min_Distance', 'Max_Distance', 'Avg_Velocity', 'Std_Velocity']
+        
+        st.markdown("### 📅 Monthly Temporal Statistics")
+        st.dataframe(monthly_stats.head(12))
+        
+        # === Plot 1: Time series of asteroid counts ===
+        st.markdown("#### Asteroid Close Approaches Over Time")
+        fig, ax = plt.subplots(figsize=(10, 4))
+        monthly_counts = df_time.groupby(df_time['Close Approach Date'].dt.to_period('M')).size()
+        monthly_counts.plot(kind='line', ax=ax, color='steelblue', linewidth=2.5, marker='o')
+        ax.fill_between(range(len(monthly_counts)), monthly_counts.values, alpha=0.3, color='steelblue')
+        ax.set_xlabel("Month")
+        ax.set_ylabel("Number of Asteroids")
+        ax.grid(True, alpha=0.3)
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close()
+        
+        # === Plot 2: Seasonal pattern ===
+        st.markdown("#### Seasonal Pattern - Asteroids by Month")
+        fig, ax = plt.subplots(figsize=(8, 4))
+        month_counts = df_time.groupby('Month').size()
+        month_names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+        ax.bar(range(1, 13), month_counts.reindex(range(1, 13), fill_value=0),
+               color=sns.color_palette("Set2", 12), edgecolor="black")
+        ax.set_xticks(range(1, 13))
+        ax.set_xticklabels(month_names, rotation=45)
+        ax.set_ylabel("Count")
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close()
+        
+        # === Plot 3: Weekly pattern ===
+        st.markdown("#### Weekly Pattern - Asteroids by Day of Week")
+        fig, ax = plt.subplots(figsize=(8, 4))
+        dow_counts = df_time.groupby('Day_of_Week').size()
+        dow_names = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+        ax.bar(range(7), dow_counts.reindex(range(7), fill_value=0),
+               color=sns.color_palette("Paired", 7), edgecolor="black")
+        ax.set_xticks(range(7))
+        ax.set_xticklabels(dow_names)
+        ax.set_ylabel("Count")
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close()
+        
+        # === Plot 4: Distance over time ===
+        st.markdown("#### Distance from Earth Over Time")
+        fig, ax = plt.subplots(figsize=(10, 4))
+        df_time_sample = df_time.sample(min(1000, len(df_time)))
+        sc = ax.scatter(df_time_sample['Close Approach Date'],
+                        df_time_sample['Distance from Earth (AU)'],
+                        c=df_time_sample['Relative Velocity (km/s)'],
+                        cmap="plasma", alpha=0.6, edgecolors="black", linewidth=0.5)
+        plt.colorbar(sc, ax=ax, label="Velocity (km/s)")
+        ax.set_ylabel("Distance (AU)")
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close()
+        
+        # === Plot 5: Cumulative count ===
+        st.markdown("#### Cumulative Asteroid Approaches")
+        fig, ax = plt.subplots(figsize=(10, 4))
+        cumulative = monthly_counts.cumsum()
+        ax.plot(cumulative.index.astype(str), cumulative.values,
+                color="darkgreen", linewidth=3, marker="o")
+        ax.set_ylabel("Cumulative Count")
+        ax.set_xlabel("Month")
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close()
+        
+    else:
+        st.error("'Close Approach Date' column not found in the dataset!")
+    st.divider()
+# ---------------------------------------------------------------------------------------------------------------------------------------
 
 
 
