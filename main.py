@@ -574,5 +574,114 @@ if option == "EDA":
 
 
 elif option == "Prediction":
-    st.markdown("### Prediction Module")
-    st.write("🚧 In Progress... Coming soon!")
+    st.markdown("### 🚀 Asteroid Hazard Prediction - Smart Model Training")
+
+    # --- Step 0: Package Loading ---
+    try:
+        import pandas as pd
+        import numpy as np
+        from sklearn.model_selection import train_test_split
+        from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+        from sklearn.utils import class_weight
+        from sklearn.preprocessing import LabelEncoder
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+        import joblib
+        st.success("✅ Basic packages loaded successfully!")
+    except ImportError as e:
+        st.error(f"❌ Missing package: {e}")
+        st.info("Install with: pip install pandas numpy scikit-learn seaborn matplotlib joblib")
+
+    # --- Step 1: Load Data ---
+    st.subheader("📊 Step 1: Load Asteroid Data")
+    uploaded_file = st.file_uploader("Upload Asteroid CSV", type=["csv"])
+    if uploaded_file is not None:
+        asteroid_data = pd.read_csv(uploaded_file)
+        st.write(f"✅ Data loaded with **{len(asteroid_data)} rows** and **{len(asteroid_data.columns)} columns**")
+        st.dataframe(asteroid_data.head())
+    else:
+        st.warning("Please upload a dataset to continue 🚀")
+        st.stop()
+
+    # --- Step 2: Identify Hazard Column ---
+    danger_columns = [col for col in asteroid_data.columns if "hazard" in col.lower()]
+    if danger_columns:
+        danger_column = danger_columns[0]
+        st.success(f"✅ Found hazard target column: `{danger_column}`")
+    else:
+        st.error("❌ Could not find hazard column automatically. Please rename your dataset properly.")
+        st.stop()
+
+    # --- Step 3: Select Features ---
+    possible_features = [
+        "absolute_magnitude_h",
+        "estimated_diameter_min_km",
+        "estimated_diameter_max_km",
+        "relative_velocity_km_s",
+        "miss_distance_au",
+        "orbiting_body"
+    ]
+    features_we_have = [f for f in possible_features if f in asteroid_data.columns]
+
+    st.write("✅ Using features:", features_we_have)
+
+    if "orbiting_body" in features_we_have:
+        encoder = LabelEncoder()
+        asteroid_data["orbiting_body_encoded"] = encoder.fit_transform(asteroid_data["orbiting_body"])
+        features_we_have.remove("orbiting_body")
+        features_we_have.append("orbiting_body_encoded")
+
+    X = asteroid_data[features_we_have]
+    y = asteroid_data[danger_column].astype(int)
+
+    # --- Step 4: Train/Test Split ---
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+
+    st.write(f"📚 Training set: {len(X_train)} | 🧪 Testing set: {len(X_test)}")
+
+    # --- Step 5: Train Model ---
+    from sklearn.ensemble import RandomForestClassifier
+    model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight="balanced")
+
+    model.fit(X_train, y_train)
+    st.success("✅ Model trained successfully!")
+
+    # --- Step 6: Evaluate Model ---
+    predictions = model.predict(X_test)
+    accuracy = accuracy_score(y_test, predictions)
+    st.metric("Model Accuracy", f"{accuracy:.2%}")
+
+    # Confusion matrix
+    conf_matrix = confusion_matrix(y_test, predictions)
+    fig, ax = plt.subplots()
+    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues",
+                xticklabels=['Safe', 'Dangerous'],
+                yticklabels=['Safe', 'Dangerous'],
+                ax=ax)
+    st.pyplot(fig)
+
+    # --- Step 7: Feature Importance ---
+    st.subheader("🧠 Feature Importance")
+    importances = model.feature_importances_
+    feat_imp = pd.DataFrame({"Feature": features_we_have, "Importance": importances})
+    feat_imp = feat_imp.sort_values("Importance", ascending=False)
+
+    st.bar_chart(feat_imp.set_index("Feature"))
+
+    # --- Step 8: Quick Prediction ---
+    st.subheader("🔮 Try a Quick Prediction")
+    example = {}
+    for feature in features_we_have:
+        val = st.number_input(f"Enter value for {feature}", float(X[feature].min()), float(X[feature].max()), float(X[feature].median()))
+        example[feature] = [val]
+
+    if st.button("Predict Asteroid Hazard 🚀"):
+        example_df = pd.DataFrame(example)
+        pred = model.predict(example_df)[0]
+        prob = model.predict_proba(example_df)[0][1]
+        if pred == 1:
+            st.error(f"🚨 Dangerous asteroid detected! (Confidence {prob:.1%})")
+        else:
+            st.success(f"🟢 Safe asteroid (Confidence {1-prob:.1%})")
