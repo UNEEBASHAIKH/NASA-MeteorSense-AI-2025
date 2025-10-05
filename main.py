@@ -471,103 +471,103 @@ if option == "EDA":
 
     st.divider()
     # --------------------------------------------------------------------------------------------------------------------------------------
-    st.subheader("⏳ TEMPORAL ANALYSIS")
+    # st.subheader("⏳ TEMPORAL ANALYSIS")
     
-    if 'Close Approach Date' in df.columns:
-        # Convert to datetime
-        df_time = df.copy()
-        df_time['Close Approach Date'] = pd.to_datetime(df_time['Close Approach Date'], errors='coerce')
-        df_time = df_time.dropna(subset=['Close Approach Date']).sort_values('Close Approach Date')
+    # if 'Close Approach Date' in df.columns:
+    #     # Convert to datetime
+    #     df_time = df.copy()
+    #     df_time['Close Approach Date'] = pd.to_datetime(df_time['Close Approach Date'], errors='coerce')
+    #     df_time = df_time.dropna(subset=['Close Approach Date']).sort_values('Close Approach Date')
         
-        # Extract features
-        df_time['Year'] = df_time['Close Approach Date'].dt.year
-        df_time['Month'] = df_time['Close Approach Date'].dt.month
-        df_time['Quarter'] = df_time['Close Approach Date'].dt.quarter
-        df_time['Day_of_Week'] = df_time['Close Approach Date'].dt.dayofweek
-        df_time['Week'] = df_time['Close Approach Date'].dt.isocalendar().week
+    #     # Extract features
+    #     df_time['Year'] = df_time['Close Approach Date'].dt.year
+    #     df_time['Month'] = df_time['Close Approach Date'].dt.month
+    #     df_time['Quarter'] = df_time['Close Approach Date'].dt.quarter
+    #     df_time['Day_of_Week'] = df_time['Close Approach Date'].dt.dayofweek
+    #     df_time['Week'] = df_time['Close Approach Date'].dt.isocalendar().week
         
-        # Monthly statistics table
-        monthly_stats = df_time.groupby(df_time['Close Approach Date'].dt.to_period('M')).agg({
-            'Asteroid ID': 'count',
-            'Distance from Earth (AU)': ['mean', 'min', 'max'],
-            'Relative Velocity (km/s)': ['mean', 'std']
-        })
-        monthly_stats.columns = ['Count', 'Avg_Distance', 'Min_Distance', 'Max_Distance', 'Avg_Velocity', 'Std_Velocity']
+    #     # Monthly statistics table
+    #     monthly_stats = df_time.groupby(df_time['Close Approach Date'].dt.to_period('M')).agg({
+    #         'Asteroid ID': 'count',
+    #         'Distance from Earth (AU)': ['mean', 'min', 'max'],
+    #         'Relative Velocity (km/s)': ['mean', 'std']
+    #     })
+    #     monthly_stats.columns = ['Count', 'Avg_Distance', 'Min_Distance', 'Max_Distance', 'Avg_Velocity', 'Std_Velocity']
         
-        st.markdown("### 📅 Monthly Temporal Statistics")
-        st.dataframe(monthly_stats.head(12))
+    #     st.markdown("### 📅 Monthly Temporal Statistics")
+    #     st.dataframe(monthly_stats.head(12))
         
-        # === Plot 1: Time series of asteroid counts ===
-        st.markdown("#### Asteroid Close Approaches Over Time")
-        fig, ax = plt.subplots(figsize=(10, 4))
-        monthly_counts = df_time.groupby(df_time['Close Approach Date'].dt.to_period('M')).size()
-        monthly_counts.plot(kind='line', ax=ax, color='steelblue', linewidth=2.5, marker='o')
-        ax.fill_between(range(len(monthly_counts)), monthly_counts.values, alpha=0.3, color='steelblue')
-        ax.set_xlabel("Month")
-        ax.set_ylabel("Number of Asteroids")
-        ax.grid(True, alpha=0.3)
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
+    #     # === Plot 1: Time series of asteroid counts ===
+    #     st.markdown("#### Asteroid Close Approaches Over Time")
+    #     fig, ax = plt.subplots(figsize=(10, 4))
+    #     monthly_counts = df_time.groupby(df_time['Close Approach Date'].dt.to_period('M')).size()
+    #     monthly_counts.plot(kind='line', ax=ax, color='steelblue', linewidth=2.5, marker='o')
+    #     ax.fill_between(range(len(monthly_counts)), monthly_counts.values, alpha=0.3, color='steelblue')
+    #     ax.set_xlabel("Month")
+    #     ax.set_ylabel("Number of Asteroids")
+    #     ax.grid(True, alpha=0.3)
+    #     plt.tight_layout()
+    #     st.pyplot(fig)
+    #     plt.close()
         
-        # === Plot 2: Seasonal pattern ===
-        st.markdown("#### Seasonal Pattern - Asteroids by Month")
-        fig, ax = plt.subplots(figsize=(8, 4))
-        month_counts = df_time.groupby('Month').size()
-        month_names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-        ax.bar(range(1, 13), month_counts.reindex(range(1, 13), fill_value=0),
-               color=sns.color_palette("Set2", 12), edgecolor="black")
-        ax.set_xticks(range(1, 13))
-        ax.set_xticklabels(month_names, rotation=45)
-        ax.set_ylabel("Count")
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
+    #     # === Plot 2: Seasonal pattern ===
+    #     st.markdown("#### Seasonal Pattern - Asteroids by Month")
+    #     fig, ax = plt.subplots(figsize=(8, 4))
+    #     month_counts = df_time.groupby('Month').size()
+    #     month_names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    #     ax.bar(range(1, 13), month_counts.reindex(range(1, 13), fill_value=0),
+    #            color=sns.color_palette("Set2", 12), edgecolor="black")
+    #     ax.set_xticks(range(1, 13))
+    #     ax.set_xticklabels(month_names, rotation=45)
+    #     ax.set_ylabel("Count")
+    #     plt.tight_layout()
+    #     st.pyplot(fig)
+    #     plt.close()
         
-        # === Plot 3: Weekly pattern ===
-        st.markdown("#### Weekly Pattern - Asteroids by Day of Week")
-        fig, ax = plt.subplots(figsize=(8, 4))
-        dow_counts = df_time.groupby('Day_of_Week').size()
-        dow_names = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-        ax.bar(range(7), dow_counts.reindex(range(7), fill_value=0),
-               color=sns.color_palette("Paired", 7), edgecolor="black")
-        ax.set_xticks(range(7))
-        ax.set_xticklabels(dow_names)
-        ax.set_ylabel("Count")
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
+    #     # === Plot 3: Weekly pattern ===
+    #     st.markdown("#### Weekly Pattern - Asteroids by Day of Week")
+    #     fig, ax = plt.subplots(figsize=(8, 4))
+    #     dow_counts = df_time.groupby('Day_of_Week').size()
+    #     dow_names = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+    #     ax.bar(range(7), dow_counts.reindex(range(7), fill_value=0),
+    #            color=sns.color_palette("Paired", 7), edgecolor="black")
+    #     ax.set_xticks(range(7))
+    #     ax.set_xticklabels(dow_names)
+    #     ax.set_ylabel("Count")
+    #     plt.tight_layout()
+    #     st.pyplot(fig)
+    #     plt.close()
         
-        # === Plot 4: Distance over time ===
-        st.markdown("#### Distance from Earth Over Time")
-        fig, ax = plt.subplots(figsize=(10, 4))
-        df_time_sample = df_time.sample(min(1000, len(df_time)))
-        sc = ax.scatter(df_time_sample['Close Approach Date'],
-                        df_time_sample['Distance from Earth (AU)'],
-                        c=df_time_sample['Relative Velocity (km/s)'],
-                        cmap="plasma", alpha=0.6, edgecolors="black", linewidth=0.5)
-        plt.colorbar(sc, ax=ax, label="Velocity (km/s)")
-        ax.set_ylabel("Distance (AU)")
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
+    #     # === Plot 4: Distance over time ===
+    #     st.markdown("#### Distance from Earth Over Time")
+    #     fig, ax = plt.subplots(figsize=(10, 4))
+    #     df_time_sample = df_time.sample(min(1000, len(df_time)))
+    #     sc = ax.scatter(df_time_sample['Close Approach Date'],
+    #                     df_time_sample['Distance from Earth (AU)'],
+    #                     c=df_time_sample['Relative Velocity (km/s)'],
+    #                     cmap="plasma", alpha=0.6, edgecolors="black", linewidth=0.5)
+    #     plt.colorbar(sc, ax=ax, label="Velocity (km/s)")
+    #     ax.set_ylabel("Distance (AU)")
+    #     plt.tight_layout()
+    #     st.pyplot(fig)
+    #     plt.close()
         
-        # === Plot 5: Cumulative count ===
-        st.markdown("#### Cumulative Asteroid Approaches")
-        fig, ax = plt.subplots(figsize=(10, 4))
-        cumulative = monthly_counts.cumsum()
-        ax.plot(cumulative.index.astype(str), cumulative.values,
-                color="darkgreen", linewidth=3, marker="o")
-        ax.set_ylabel("Cumulative Count")
-        ax.set_xlabel("Month")
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
+    #     # === Plot 5: Cumulative count ===
+    #     st.markdown("#### Cumulative Asteroid Approaches")
+    #     fig, ax = plt.subplots(figsize=(10, 4))
+    #     cumulative = monthly_counts.cumsum()
+    #     ax.plot(cumulative.index.astype(str), cumulative.values,
+    #             color="darkgreen", linewidth=3, marker="o")
+    #     ax.set_ylabel("Cumulative Count")
+    #     ax.set_xlabel("Month")
+    #     plt.xticks(rotation=45)
+    #     plt.tight_layout()
+    #     st.pyplot(fig)
+    #     plt.close()
         
-    else:
-        st.error("'Close Approach Date' column not found in the dataset!")
-    st.divider()
+    # else:
+    #     st.error("'Close Approach Date' column not found in the dataset!")
+    # st.divider()
 # ---------------------------------------------------------------------------------------------------------------------------------------
 
 
