@@ -111,7 +111,7 @@ Our goal:
 
 ## 📈 Model Results
 
-### 🎯 Performance Metrics
+###  Performance Metrics
 ![Model Accuracy](<img width="1000" height="600" alt="Figure_1" src="https://github.com/user-attachments/assets/98659846-947c-4ec7-8cb6-f537e585df34" />
 )
 
@@ -158,7 +158,7 @@ orbiting_body_encoded: 0.00
 ```diff
 + ✅ Safe asteroid (Confidence 100.0%)
 ```
-deployment link :[https://nasa-meteorsense-ai-2025-i8y6alu22ecrjz4uhzbuog.streamlit.app/]
+**DEPLOYMENT LINK**....https://huggingface.co/spaces/Abdullah-31/AstroBlitz
 
 **Interpretation:**
 - Small diameter (0.03-0.07 km) ✅
