@@ -54,7 +54,7 @@ Our goal:
 **Total Objects:** 10,151 asteroids  
 **Source:** [NASA NEO API](https://api.nasa.gov/)
 
-![Dataset Overview](images/image%20(2).webp)
+![Dataset Overview]()
 
 | Feature | Description |
 |---------|-------------|
@@ -112,7 +112,8 @@ Our goal:
 ## 📈 Model Results
 
 ### 🎯 Performance Metrics
-![Model Accuracy](images/image%20(3).webp)
+![Model Accuracy](<img width="1000" height="600" alt="Figure_1" src="https://github.com/user-attachments/assets/98659846-947c-4ec7-8cb6-f537e585df34" />
+)
 
 | Metric | Score |
 |--------|-------|
@@ -141,7 +142,7 @@ Our goal:
 ## 🎮 Interactive Prediction
 
 ### 🔬 Try a Quick Prediction
-![Interactive Prediction](images/image%20(4).webp)
+![Interactive Prediction](C:\Users\EXTECH\Downloads\image (4).webp)
 
 **Input Parameters:**
 ```
@@ -157,6 +158,7 @@ orbiting_body_encoded: 0.00
 ```diff
 + ✅ Safe asteroid (Confidence 100.0%)
 ```
+deployment link :[https://nasa-meteorsense-ai-2025-i8y6alu22ecrjz4uhzbuog.streamlit.app/]
 
 **Interpretation:**
 - Small diameter (0.03-0.07 km) ✅
