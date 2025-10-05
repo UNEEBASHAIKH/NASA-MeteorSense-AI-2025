@@ -1,4 +1,4 @@
-# 🌍 NASA MeteorSense AI 2025 — Near-Earth Object (NEO) Hazard Prediction using XGBoost
+# 🌍 TEAM: ASTROBLITZ NASA MeteorSense AI 2025 — Near-Earth Object (NEO) Hazard Prediction using XGBoost
 
 > 🚀 *An AI-powered planetary defense project built on real NASA data — empowering humanity to detect asteroid threats before they strike.*
 
@@ -100,7 +100,8 @@ Our goal:
 ### 🟢 Precision–Recall Curve
 > Demonstrates the model’s strength in correctly identifying hazardous NEOs while maintaining reliability.
 
-![Precision–Recall Curve](images/precision_recall_curve.png)
+![Precision–Recall Curve](<img width="695" height="470" alt="download" src="https://github.com/user-attachments/assets/f8a44f69-86cc-49bd-bebd-120b19c128c8" />
+)
 
 ---
 
@@ -115,7 +116,8 @@ Our goal:
 ### 📊 Visualization
 XGBoost’s internal gain metric for interpretability:
 
-![Feature Importance](images/feature_importance.png)
+![Feature Importance](<img width="1000" height="600" alt="Figure_2" src="https://github.com/user-attachments/assets/2dbfdb66-0cd3-4d47-9a44-1218d730acc8" />
+)
 
 ---
 
@@ -192,12 +194,11 @@ Together, we move toward a world where AI safeguards humanity from the silent wa
 
 ### 🚀 **Team:  ASTROBLITZ> NASA MeteorSense AI — 2025**
 
-| Role | Name | GitHub |
-|------|------|---------|
-| 🛰️ **Team Lead** | **Uneeba** | [@UNEEBASHAIKH](https://github.com/UNEEBASHAIKH) |
-| 👨‍💻 **Data scientist** | ** Muhammad Umer** | [@https://github.com/MUmer007) |
-| 🧠 **Data Scientist** | **Abdul basit** | [/@https://github.com/comp3ngrBasit) |
-| 🧮 ** DATA SCIENTIST AND ML Researcher** | **Abdullah Asif** | [@https://github.com/Abdullah-056) |
-| 🌍 **Data Analyst and ML Researcher** | **Ahmed Hassan** | [@https://github.com/TechWithAhmedHassan) |
-| 👨‍💻 **Data scientist** | ** HIRA ARIF** | [@https://github.com/HiraArif666) |
-
+| 🪐 **Role**                           | 👩‍🚀 **Name**    | 🌐 **GitHub**                                                  |
+| ------------------------------------- | ----------------- | -------------------------------------------------------------- |
+| 🛰️ **Team Lead**                     | **Uneeba**        | [@UNEEBASHAIKH](https://github.com/UNEEBASHAIKH)               |
+| 👨‍💻 **Data Scientist**              | **Muhammad Umer** | [@MUmer007](https://github.com/MUmer007)                       |
+| 🧠 **Data Scientist**                 | **Abdul Basit**   | [@comp3ngrBasit](https://github.com/comp3ngrBasit)             |
+| 🧮 **Data Scientist & ML Researcher** | **Abdullah Asif** | [@Abdullah-056](https://github.com/Abdullah-056)               |
+| 🌍 **Data Analyst & ML Researcher**   | **Ahmed Hassan**  | [@TechWithAhmedHassan](https://github.com/TechWithAhmedHassan) |
+| 👩‍💻 **Data Scientist**              | **Hira Arif**     | [@HiraArif666](https://github.com/HiraArif666)                 |
