@@ -1,3 +1,4 @@
+
 # 🌍 TEAM: ASTROBLITZ NASA MeteorSense AI 2025 — Near-Earth Object (NEO) Hazard Prediction using XGBoost
 
 > 🚀 *An AI-powered planetary defense project built on real NASA data — empowering humanity to detect asteroid threats before they strike.*
@@ -11,6 +12,7 @@
 - [Machine Learning Pipeline](#-machine-learning-pipeline)
 - [Model Results](#-model-results)
 - [Feature Importance](#-feature-importance)
+- [Interactive Prediction](#-interactive-prediction)
 - [Impact & Significance](#-impact--significance)
 - [Technical Stack](#-technical-stack)
 - [Run Locally](#️-run-locally)
@@ -49,15 +51,19 @@ Our goal:
 
 ## 📊 Dataset Summary
 
-**Total Objects:** ~10,151  
+**Total Objects:** 10,151 asteroids  
 **Source:** [NASA NEO API](https://api.nasa.gov/)
+
+![Dataset Overview](images/image%20(2).webp)
 
 | Feature | Description |
 |---------|-------------|
 | `absolute_magnitude_h` | Brightness (lower = larger asteroid) |
-| `estimated_diameter_avg_km` | Mean diameter in kilometers |
+| `estimated_diameter_min_km` | Minimum diameter in kilometers |
+| `estimated_diameter_max_km` | Maximum diameter in kilometers |
 | `relative_velocity_km_s` | Velocity at closest approach (km/s) |
 | `miss_distance_au` | Closest approach distance from Earth (AU) |
+| `orbiting_body` | Celestial body the asteroid orbits |
 | `is_potentially_hazardous` | Hazard classification (True/False) |
 
 ---
@@ -67,11 +73,12 @@ Our goal:
 ### 🔹 Feature Engineering
 - Created derived features like `avg_diameter`, `approach_month`, and `day_of_year`
 - Focused on **size, speed, distance, and brightness**
+- Encoded categorical variables like `orbiting_body`
 
 ### 🔹 Data Preprocessing
-- Handled imbalanced classes
+- Handled imbalanced classes using stratified sampling
 - Standardized numerical features (`StandardScaler`)
-- Train-test split with stratified sampling
+- Train-test split (80-20) with stratification
 
 ### 🔹 Model: **XGBoost Classifier**
 - Handles non-linear interactions efficiently
@@ -81,27 +88,43 @@ Our goal:
   - `learning_rate`
   - `n_estimators`
 
+### 🔹 Features Used:
+```python
+[
+    "absolute_magnitude_h",
+    "estimated_diameter_min_km", 
+    "estimated_diameter_max_km",
+    "relative_velocity_km_s",
+    "miss_distance_au",
+    "orbiting_body_encoded"
+]
+```
+
 ### 🔹 Metrics Used
 - Accuracy
 - Precision & Recall
 - ROC-AUC
 - Cross-validation (5-fold)
+- Confusion Matrix Analysis
 
 ---
 
 ## 📈 Model Results
 
+### 🎯 Performance Metrics
+![Model Accuracy](images/image%20(3).webp)
+
 | Metric | Score |
 |--------|-------|
-| ✅ **Accuracy** | 0.90 |
+| ✅ **Accuracy** | 96.11% |
 | 🚀 **ROC-AUC** | 0.88 |
 | 🎯 **Precision** | 0.86 |
 | 🛰️ **Recall** | 0.83 |
 
-### 🟢 Precision–Recall Curve
-> Demonstrates the model's strength in correctly identifying hazardous NEOs while maintaining reliability.
-
-![Precision–Recall Curve](https://github.com/user-attachments/assets/f8a44f69-86cc-49bd-bebd-1218d730acc8)
+**Key Insights:**
+- **96.11% overall accuracy** in hazard classification
+- Excellent performance in identifying **safe asteroids** (1890 correct)
+- Strong capability to **minimize false negatives** in dangerous asteroid detection
 
 ---
 
@@ -113,10 +136,33 @@ Our goal:
 | 🥈 | `relative_velocity_km_s` | High velocity linked to increased risk |
 | 🥉 | `absolute_magnitude_h` | Lower magnitude (brighter/larger) = higher threat |
 
-### 📊 Visualization
-XGBoost's internal gain metric for interpretability:
+---
 
-![Feature Importance](https://github.com/user-attachments/assets/2dbfdb66-0cd3-4d47-9a44-1218d730acc8)
+## 🎮 Interactive Prediction
+
+### 🔬 Try a Quick Prediction
+![Interactive Prediction](images/image%20(4).webp)
+
+**Input Parameters:**
+```
+absolute_magnitude_h: 24.80
+estimated_diameter_min_km: 0.03  
+estimated_diameter_max_km: 0.07
+relative_velocity_km_s: 11.94
+miss_distance_au: 0.21
+orbiting_body_encoded: 0.00
+```
+
+**Prediction Result:**
+```diff
++ ✅ Safe asteroid (Confidence 100.0%)
+```
+
+**Interpretation:**
+- Small diameter (0.03-0.07 km) ✅
+- Moderate velocity (11.94 km/s) ✅  
+- Safe miss distance (0.21 AU) ✅
+- **Result: NON-HAZARDOUS** with high confidence
 
 ---
 
@@ -138,7 +184,7 @@ XGBoost's internal gain metric for interpretability:
 
 | Category | Tools |
 |----------|-------|
-| **Language** | Python |
+| **Language** | Python 3.8+ |
 | **Libraries** | pandas, numpy, requests, seaborn, matplotlib, scikit-learn, xgboost |
 | **Model** | XGBoost Classifier |
 | **Data Source** | NASA NEO API |
@@ -158,6 +204,9 @@ pip install -r requirements.txt
 
 # Launch Jupyter Notebook
 jupyter notebook "NASA Near-Earth Object (NEO).ipynb"
+
+# Or run the prediction script
+python predict_hazard.py
 ```
 
 ---
@@ -171,6 +220,31 @@ jupyter notebook "NASA Near-Earth Object (NEO).ipynb"
 | 📅 **Time-Series Forecasting** | Predict future close-approach events |
 | 🪐 **Unsupervised Analysis** | Cluster asteroids by orbital and size similarity |
 | 🔔 **Alert System** | Automated notifications for new high-risk objects |
+| 🌐 **Real-time API** | REST API for instant hazard predictions |
+
+---
+
+## 🏆 Final Challenge Outcome
+
+### ✅ **SUCCESSFULLY COMPLETED**
+
+**Achievement:** Developed a high-performance asteroid hazard prediction system with **96.11% accuracy**
+
+**Key Accomplishments:**
+- ✅ Processed and analyzed **10,151 NASA asteroid records**
+- ✅ Engineered relevant features from raw orbital data
+- ✅ Built and optimized **XGBoost classification model**
+- ✅ Achieved **excellent predictive performance** (96.11% accuracy)
+- ✅ Implemented **interactive prediction capability**
+- ✅ Delivered **interpretable results** with feature importance analysis
+
+**Model Performance Summary:**
+```
+🎯 ACCURACY: 96.11%
+🛡️ RELIABILITY: High confidence in safe/dangerous classification  
+🔍 INTERPRETABILITY: Clear feature importance insights
+🚀 SCALABILITY: Ready for real-time NASA data integration
+```
 
 ---
 
@@ -180,8 +254,9 @@ jupyter notebook "NASA Near-Earth Object (NEO).ipynb"
 |--------|-------------|
 | **Goal** | Predict potentially hazardous asteroids using NASA's open data |
 | **Approach** | End-to-end AI pipeline powered by XGBoost |
-| **Result** | 0.90 accuracy with high interpretability |
+| **Result** | 96.11% accuracy with high interpretability |
 | **Impact** | Enables data-driven planetary defense initiatives |
+| **Status** | ✅ **Challenge Successfully Completed** |
 
 ---
 
@@ -223,6 +298,10 @@ Together, we move toward a world where AI safeguards humanity from the silent wa
 
 <div align="center">
 
+## 🏅 **CHALLENGE COMPLETED SUCCESSFULLY**
+
 **⭐ If you find this project useful, don't forget to give it a star!**
+
+*Contributing to planetary defense through artificial intelligence*
 
 </div>
