@@ -160,21 +160,24 @@ pip install -r requirements.txt
 # Launch Jupyter Notebook
 jupyter notebook "NASA Near-Earth Object (NEO).ipynb"
 
-| Future Enhancement                    | Description                                               |
+| 🔧 **Feature**                 | 📝 **Description**                                        |
 | ------------------------------ | --------------------------------------------------------- |
 | 🧠 **Deep Learning**           | Incorporate LSTM/Transformers for orbit-based forecasting |
 | 🌍 **Web Dashboard**           | Interactive real-time monitoring (Streamlit or Dash)      |
 | 📅 **Time-Series Forecasting** | Predict future close-approach events                      |
 | 🪐 **Unsupervised Analysis**   | Cluster asteroids by orbital and size similarity          |
 | 🔔 **Alert System**            | Automated notifications for new high-risk objects         |
-**🧾 Summary**
+
+
+##  🧾 Summary
 | Aspect       | Description                                                    |
 | ------------ | -------------------------------------------------------------- |
 | **Goal**     | Predict potentially hazardous asteroids using NASA’s open data |
 | **Approach** | End-to-end AI pipeline powered by XGBoost                      |
 | **Result**   | 0.90 accuracy with high interpretability                       |
 | **Impact**   | Enables data-driven planetary defense initiatives              |
-# 🔗 Resources
+
+##  🔗 Resources
 
 ### 🌌 NASA Data & APIs
 - [NASA Open Data Portal](https://data.nasa.gov/)
@@ -183,12 +186,16 @@ jupyter notebook "NASA Near-Earth Object (NEO).ipynb"
 - [NASA JPL Small-Body Database Browser](https://ssd.jpl.nasa.gov/tools/sbdb_query.html)
 - [NASA Asteroid Watch](https://www.jpl.nasa.gov/asteroid-watch)
 - [NASA Open APIs Documentation (GitHub)](https://github.com/nasa/api-docs)
-### 🌠 Vision
+
+
+##   🌠 Vision
 
 “The future of planetary defense lies not just in rockets — but in data.”
 — NASA MeteorSense AI Team (2025)
 
 Together, we move toward a world where AI safeguards humanity from the silent wanderers of the cosmos. 🌌
+
+
 
 ## 🧑‍💻 Developed By
 
