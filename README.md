@@ -158,7 +158,7 @@ orbiting_body_encoded: 0.00
 ```diff
 + ✅ Safe asteroid (Confidence 100.0%)
 ```
-**DEPLOYMENT LINK**....https://huggingface.co/spaces/Abdullah-31/AstroBlitz
+**DEPLOYMENT LINK**....https://nasa-meteoroids-hazard-prediction.lovable.app/
 
 **Interpretation:**
 - Small diameter (0.03-0.07 km) ✅
